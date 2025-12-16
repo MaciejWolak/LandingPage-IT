@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TechSolutions - Twoja Firma IT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+      @keyframes slide-in {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .animate-slide-in {
+        animation: slide-in 0.6s ease-out;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to bottom, #2563eb, #7c3aed);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div id="app">
+      <!-- Navigation -->
+      <nav-component
+        :is-mobile-menu-open="isMobileMenuOpen"
+        @toggle-menu="toggleMobileMenu"
+      ></nav-component>
+
+      <!-- Hero Section -->
+      <hero-section @scroll-to-contact="scrollToContact"></hero-section>
+
+      <!-- Services Section -->
+      <services-section></services-section>
+
+      <!-- About Section -->
+      <about-section></about-section>
+
+      <!-- Team Section -->
+      <team-section></team-section>
+
+      <!-- Contact Section -->
+      <contact-section ref="contactSection"></contact-section>
+
+      <!-- Footer -->
+      <footer-component></footer-component>
+    </div>
+
+    <script>
+      const { createApp } = Vue;
+
+      // Navigation Component
+      const NavComponent = {
+        props: ["isMobileMenuOpen"],
+        emits: ["toggle-menu"],
+        template: `
+          <nav class="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 backdrop-blur-lg shadow-2xl fixed w-full z-50 border-b border-blue-500/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="flex justify-between h-20">
+                <!-- Logo Section -->
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <span class="text-white font-bold text-lg">T</span>
+                    </div>
+                    <div class="flex flex-col">
+                      <span class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        TechSolutions
+                      </span>
+                      <span class="text-xs text-blue-300 tracking-wider">INNOVATION FIRST</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-1">
+                  <a href="#home" class="relative px-4 py-2 text-blue-100 hover:text-white transition-all duration-300 group">
+                    <span class="relative z-10">Strona główna</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                  </a>
+                  <a href="#services" class="relative px-4 py-2 text-blue-100 hover:text-white transition-all duration-300 group">
+                    <span class="relative z-10">Usługi</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                  </a>
+                  <a href="#about" class="relative px-4 py-2 text-blue-100 hover:text-white transition-all duration-300 group">
+                    <span class="relative z-10">O nas</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                  </a>
+                  <a href="#team" class="relative px-4 py-2 text-blue-100 hover:text-white transition-all duration-300 group">
+                    <span class="relative z-10">Zespół</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                  </a>
+                  <a href="#contact" class="relative px-4 py-2 text-blue-100 hover:text-white transition-all duration-300 group">
+                    <span class="relative z-10">Kontakt</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                  </a>
+                  
+                  <!-- CTA Button -->
+                  <div class="ml-6">
+                    <button class="relative px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-blue-400/30">
+                      <span class="relative z-10 flex items-center space-x-2">
+                        <span>💬</span>
+                        <span>Bezpłatna konsultacja</span>
+                      </span>
+                      <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                  <button @click="$emit('toggle-menu')" 
+                          class="p-2 text-blue-200 hover:text-white hover:bg-blue-800/30 rounded-lg transition-all duration-300">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path v-if="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                      <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div v-if="isMobileMenuOpen" class="md:hidden">
+              <div class="px-4 pt-4 pb-6 space-y-2 bg-gradient-to-b from-slate-900 to-blue-900 border-t border-blue-500/20 shadow-2xl">
+                <a href="#home" class="block px-4 py-3 text-blue-100 hover:text-white hover:bg-blue-800/30 rounded-lg transition-all duration-300 transform hover:translate-x-2">
+                  <span class="flex items-center space-x-3">
+                    <span>🏠</span>
+                    <span>Strona główna</span>
+                  </span>
+                </a>
+                <a href="#services" class="block px-4 py-3 text-blue-100 hover:text-white hover:bg-blue-800/30 rounded-lg transition-all duration-300 transform hover:translate-x-2">
+                  <span class="flex items-center space-x-3">
+                    <span>⚙️</span>
+                    <span>Usługi</span>
+                  </span>
+                </a>
+                <a href="#about" class="block px-4 py-3 text-blue-100 hover:text-white hover:bg-blue-800/30 rounded-lg transition-all duration-300 transform hover:translate-x-2">
+                  <span class="flex items-center space-x-3">
+                    <span>📋</span>
+                    <span>O nas</span>
+                  </span>
+                </a>
+                <a href="#team" class="block px-4 py-3 text-blue-100 hover:text-white hover:bg-blue-800/30 rounded-lg transition-all duration-300 transform hover:translate-x-2">
+                  <span class="flex items-center space-x-3">
+                    <span>👥</span>
+                    <span>Zespół</span>
+                  </span>
+                </a>
+                <a href="#contact" class="block px-4 py-3 text-blue-100 hover:text-white hover:bg-blue-800/30 rounded-lg transition-all duration-300 transform hover:translate-x-2">
+                  <span class="flex items-center space-x-3">
+                    <span>📞</span>
+                    <span>Kontakt</span>
+                  </span>
+                </a>
+                
+                <!-- Mobile CTA Button -->
+                <div class="pt-4 border-t border-blue-500/20">
+                  <button class="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg">
+                    <span class="flex items-center justify-center space-x-2">
+                      <span>💬</span>
+                      <span>Bezpłatna konsultacja</span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </nav>
+        `,
+      };
+
+      // Hero Section Component
+      const HeroSection = {
+        emits: ["scroll-to-contact"],
+        data() {
+          return {
+            particles: Array.from({ length: 50 }, (_, i) => ({
+              id: i,
+              x: Math.random() * 100,
+              y: Math.random() * 100,
+              size: Math.random() * 4 + 1,
+              duration: Math.random() * 20 + 10,
+            })),
+          };
+        },
+        template: `
+          <section id="home" class="relative pt-20 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 min-h-screen flex items-center overflow-hidden">
+            <!-- Animated Background Particles -->
+            <div class="absolute inset-0">
+              <div v-for="particle in particles" :key="particle.id" 
+                   class="absolute w-1 h-1 bg-blue-400/30 rounded-full animate-pulse"
+                   :style="{
+                     left: particle.x + '%',
+                     top: particle.y + '%',
+                     animationDelay: Math.random() * 2 + 's',
+                     animationDuration: particle.duration + 's'
+                   }">
+              </div>
+            </div>
+            
+            <!-- Gradient Overlays -->
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent"></div>
+            
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+              <div class="text-center">
+                <!-- Badge -->
+                <div class="inline-flex items-center px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-200 text-sm font-medium mb-8 backdrop-blur-sm">
+                  <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                  Dostępni dla nowych projektów
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                  <span class="bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent">
+                    Rozwijamy Twój
+                  </span>
+                  <br>
+                  <span class="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
+                    Biznes
+                  </span>
+                  <br>
+                  <span class="bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent">
+                    z Pomocą Technologii
+                  </span>
+                </h1>
+                
+                <p class="text-xl md:text-2xl text-blue-100/80 mb-12 max-w-4xl mx-auto leading-relaxed">
+                  Jesteśmy zespołem ekspertów IT, którzy pomagają firmom w 
+                  <span class="text-blue-300 font-semibold">transformacji cyfrowej</span>. 
+                  Tworzymy nowoczesne rozwiązania, które zwiększają efektywność i konkurencyjność.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+                  <button @click="$emit('scroll-to-contact')" 
+                          class="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-semibold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 border border-blue-400/30">
+                    <span class="relative z-10 flex items-center space-x-2">
+                      <span>🚀</span>
+                      <span>Rozpocznij Projekt</span>
+                      <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                      </svg>
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </button>
+                  
+                  <button class="group px-8 py-4 border-2 border-blue-400/50 text-blue-200 text-lg font-semibold rounded-2xl hover:bg-blue-500/10 hover:border-blue-300 transition-all duration-300 backdrop-blur-sm">
+                    <span class="flex items-center space-x-2">
+                      <span>📂</span>
+                      <span>Zobacz Portfolio</span>
+                      <svg class="w-5 h-5 transform group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+                
+                <!-- Stats Section -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+                  <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                      150+
+                    </div>
+                    <div class="text-blue-200/70 text-sm">Projektów</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                      50+
+                    </div>
+                    <div class="text-blue-200/70 text-sm">Klientów</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-400 to-red-400 bg-clip-text text-transparent mb-2">
+                      6
+                    </div>
+                    <div class="text-blue-200/70 text-sm">Lat</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent mb-2">
+                      24/7
+                    </div>
+                    <div class="text-blue-200/70 text-sm">Wsparcie</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+              <div class="flex flex-col items-center text-blue-200/60">
+                <span class="text-sm mb-2">Przewiń w dół</span>
+                <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+              </div>
+            </div>
+          </section>
+        `,
+      };
+
+      // Services Section Component
+      const ServicesSection = {
+        data() {
+          return {
+            services: [
+              {
+                icon: "💻",
+                title: "Rozwój Aplikacji Web",
+                description:
+                  "Tworzymy nowoczesne aplikacje webowe przy użyciu najnowszych technologii jak Vue.js, React i Node.js.",
+                gradient: "from-blue-500 to-purple-600",
+                borderColor: "border-blue-500/20",
+              },
+              {
+                icon: "📱",
+                title: "Aplikacje Mobile",
+                description:
+                  "Projektujemy i rozwijamy aplikacje mobilne dla iOS i Android z naciskiem na doskonałe UX.",
+                gradient: "from-purple-500 to-pink-600",
+                borderColor: "border-purple-500/20",
+              },
+              {
+                icon: "☁️",
+                title: "Rozwiązania Cloud",
+                description:
+                  "Migrujemy infrastrukturę do chmury i optymalizujemy koszty oraz wydajność systemów.",
+                gradient: "from-cyan-500 to-blue-600",
+                borderColor: "border-cyan-500/20",
+              },
+              {
+                icon: "🛡️",
+                title: "Cyberbezpieczeństwo",
+                description:
+                  "Zabezpieczamy systemy przed zagrożeniami i przeprowadzamy audyty bezpieczeństwa.",
+                gradient: "from-red-500 to-orange-600",
+                borderColor: "border-red-500/20",
+              },
+              {
+                icon: "🤖",
+                title: "Automatyzacja Procesów",
+                description:
+                  "Automatyzujemy powtarzalne zadania i optymalizujemy procesy biznesowe.",
+                gradient: "from-green-500 to-teal-600",
+                borderColor: "border-green-500/20",
+              },
+              {
+                icon: "📊",
+                title: "Analityka Danych",
+                description:
+                  "Pomagamy w analizie danych i tworzeniu raportów biznesowych opartych na AI.",
+                gradient: "from-indigo-500 to-purple-600",
+                borderColor: "border-indigo-500/20",
+              },
+            ],
+          };
+        },
+        template: `
+          <section id="services" class="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 opacity-5">
+              <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.3) 1px, transparent 0); background-size: 50px 50px;"></div>
+            </div>
+            
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="text-center mb-20">
+                <div class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-6">
+                  <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                  Nasze Specjalności
+                </div>
+                
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                  <span class="bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
+                    Usługi IT Nowej Generacji
+                  </span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                  Oferujemy kompleksowe rozwiązania IT dostosowane do potrzeb Twojej firmy. 
+                  <span class="text-blue-600 font-semibold">Każdy projekt to unikalne wyzwanie</span>, 
+                  które realizujemy z pasją i precyzją.
+                </p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div v-for="(service, index) in services" :key="service.title" 
+                     class="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 border border-gray-100"
+                     :class="service.borderColor"
+                     :style="{ animationDelay: (index * 100) + 'ms' }">
+                  
+                  <!-- Gradient Background on Hover -->
+                  <div class="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl"
+                       :class="'bg-gradient-to-br ' + service.gradient"></div>
+                  
+                  <!-- Icon Container -->
+                  <div class="relative mb-6">
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-4 transform group-hover:scale-110 transition-transform duration-300"
+                         :class="'bg-gradient-to-br ' + service.gradient">
+                      <span class="filter drop-shadow-sm">{{ service.icon }}</span>
+                    </div>
+                    
+                    <!-- Floating Badge -->
+                    <div class="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                         :class="'bg-gradient-to-br ' + service.gradient">
+                      <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  <h3 class="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors duration-300">
+                    {{ service.title }}
+                  </h3>
+                  
+                  <p class="text-gray-600 leading-relaxed mb-6">
+                    {{ service.description }}
+                  </p>
+                  
+                  <!-- CTA Link -->
+                  <div class="flex items-center text-blue-600 font-semibold opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                    <span class="mr-2">Dowiedz się więcej</span>
+                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </div>
+                  
+                  <!-- Corner Decoration -->
+                  <div class="absolute top-4 right-4 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+                    <div class="w-full h-full rounded-full opacity-30"
+                         :class="'bg-gradient-to-br ' + service.gradient"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Bottom CTA -->
+              <div class="text-center mt-16">
+                <p class="text-gray-600 mb-6">Nie znalazłeś tego czego szukasz?</p>
+                <button class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                  <span class="mr-2">💬</span>
+                  <span>Skonsultuj swój projekt</span>
+                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </section>
+        `,
+      };
+
+      // About Section Component
+      const AboutSection = {
+        data() {
+          return {
+            stats: [
+              {
+                number: "150+",
+                label: "Zrealizowanych Projektów",
+                icon: "🚀",
+                color: "from-blue-500 to-cyan-500",
+              },
+              {
+                number: "50+",
+                label: "Zadowolonych Klientów",
+                icon: "🤝",
+                color: "from-purple-500 to-pink-500",
+              },
+              {
+                number: "6",
+                label: "Lat Doświadczenia",
+                icon: "⭐",
+                color: "from-yellow-500 to-orange-500",
+              },
+              {
+                number: "24/7",
+                label: "Wsparcie Techniczne",
+                icon: "🛠️",
+                color: "from-green-500 to-teal-500",
+              },
+            ],
+            features: [
+              "Doświadczony zespół ekspertów",
+              "Najnowsze technologie i metodologie",
+              "Terminowa realizacja projektów",
+              "Konkurencyjne ceny",
+              "Długoterminowe wsparcie",
+            ],
+          };
+        },
+        template: `
+          <section id="about" class="py-24 bg-gradient-to-b from-slate-50 to-blue-50 relative overflow-hidden">
+            <!-- Background Decorations -->
+            <div class="absolute top-0 left-0 w-96 h-96 bg-blue-200/20 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-200/20 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
+            
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- Left Content -->
+                <div class="space-y-8">
+                  <div>
+                    <div class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-6">
+                      <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                      Nasza Historia
+                    </div>
+                    
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                      <span class="bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
+                        Tworzymy Przyszłość
+                      </span>
+                      <br>
+                      <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Twojego Biznesu
+                      </span>
+                    </h2>
+                    
+                    <p class="text-lg text-gray-600 leading-relaxed mb-8">
+                      Od <span class="font-semibold text-blue-600">2018 roku</span> pomagamy firmom w całej Polsce w transformacji cyfrowej. 
+                      Nasza misja to tworzenie rozwiązań, które nie tylko rozwiązują problemy, 
+                      ale także <span class="font-semibold text-purple-600">otwierają nowe możliwości biznesowe</span>.
+                    </p>
+                  </div>
+                  
+                  <!-- Stats Grid -->
+                  <div class="grid grid-cols-2 gap-6">
+                    <div v-for="(stat, index) in stats" :key="stat.label" 
+                         class="group text-center p-6 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                         :style="{ animationDelay: (index * 100) + 'ms' }">
+                      <div class="flex justify-center mb-3">
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transform group-hover:scale-110 transition-transform duration-300"
+                             :class="'bg-gradient-to-br ' + stat.color">
+                          {{ stat.icon }}
+                        </div>
+                      </div>
+                      <div class="text-3xl font-bold mb-2"
+                           :class="'bg-gradient-to-r ' + stat.color + ' bg-clip-text text-transparent'">
+                        {{ stat.number }}
+                      </div>
+                      <div class="text-sm text-gray-600 font-medium">{{ stat.label }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Content -->
+                <div class="space-y-8">
+                  <!-- Features Card -->
+                  <div class="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 rounded-3xl p-8 text-white shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                    <div class="flex items-center mb-6">
+                      <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mr-4">
+                        <span class="text-2xl">✨</span>
+                      </div>
+                      <h3 class="text-2xl font-bold">Dlaczego TechSolutions?</h3>
+                    </div>
+                    
+                    <ul class="space-y-4">
+                      <li v-for="(feature, index) in features" :key="feature" 
+                          class="flex items-center opacity-0 animate-slide-in"
+                          :style="{ animationDelay: (index * 200 + 500) + 'ms', animationFillMode: 'forwards' }">
+                        <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                          <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                          </svg>
+                        </div>
+                        <span class="text-blue-100">{{ feature }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <!-- Mission Statement -->
+                  <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-blue-100">
+                    <div class="flex items-start space-x-4">
+                      <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <span class="text-2xl">🎯</span>
+                      </div>
+                      <div>
+                        <h4 class="text-lg font-bold text-gray-900 mb-2">Nasza Misja</h4>
+                        <p class="text-gray-600 leading-relaxed">
+                          Wspieramy firmy w ich cyfrowej transformacji, dostarczając innowacyjne rozwiązania IT, 
+                          które zwiększają efektywność, obniżają koszty i otwierają nowe możliwości rozwoju.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        `,
+      };
+
+      // Team Section Component
+      const TeamSection = {
+        data() {
+          return {
+            team: [
+              {
+                name: "Anna Kowalska",
+                position: "CEO & Founder",
+                image: "👩‍💼",
+                description:
+                  "Ekspert w zarządzaniu projektami IT z 10-letnim doświadczeniem.",
+                gradient: "from-pink-500 to-rose-500",
+                skills: ["Zarządzanie", "Strategia", "Leadership"],
+              },
+              {
+                name: "Marcin Nowak",
+                position: "Lead Developer",
+                image: "👨‍💻",
+                description:
+                  "Specjalista Full-Stack z pasją do nowoczesnych technologii.",
+                gradient: "from-blue-500 to-cyan-500",
+                skills: ["Vue.js", "Node.js", "Python"],
+              },
+              {
+                name: "Katarzyna Wiśniewska",
+                position: "UX/UI Designer",
+                image: "👩‍🎨",
+                description:
+                  "Tworzy intuicyjne interfejsy skupione na doświadczeniu użytkownika.",
+                gradient: "from-purple-500 to-pink-500",
+                skills: ["Figma", "Prototyping", "Research"],
+              },
+              {
+                name: "Piotr Zieliński",
+                position: "DevOps Engineer",
+                image: "👨‍🔧",
+                description:
+                  "Ekspert w automatyzacji i infrastrukturze chmurowej.",
+                gradient: "from-green-500 to-teal-500",
+                skills: ["AWS", "Docker", "Kubernetes"],
+              },
+            ],
+          };
+        },
+        template: `
+          <section id="team" class="py-24 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+            <!-- Background Elements -->
+            <div class="absolute top-20 left-10 w-20 h-20 bg-blue-200/30 rounded-full blur-xl"></div>
+            <div class="absolute bottom-20 right-10 w-32 h-32 bg-purple-200/30 rounded-full blur-xl"></div>
+            
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="text-center mb-20">
+                <div class="inline-flex items-center px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium mb-6">
+                  <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                  Nasz Dream Team
+                </div>
+                
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                  <span class="bg-gradient-to-r from-gray-900 to-purple-800 bg-clip-text text-transparent">
+                    Poznaj Ekspertów
+                  </span>
+                  <br>
+                  <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Za Twoim Sukcesem
+                  </span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                  Nasz zespół to połączenie doświadczenia, kreatywności i pasji do technologii. 
+                  <span class="text-purple-600 font-semibold">Każdy członek</span> wnosi unikalne umiejętności.
+                </p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div v-for="(member, index) in team" :key="member.name" 
+                     class="group relative"
+                     :style="{ animationDelay: (index * 150) + 'ms' }">
+                  
+                  <!-- Card Container -->
+                  <div class="relative bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-6 border border-gray-100 overflow-hidden">
+                    
+                    <!-- Background Gradient -->
+                    <div class="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"
+                         :class="'bg-gradient-to-br ' + member.gradient"></div>
+                    
+                    <!-- Avatar -->
+                    <div class="relative mb-6">
+                      <div class="w-24 h-24 mx-auto rounded-3xl flex items-center justify-center text-5xl mb-4 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg"
+                           :class="'bg-gradient-to-br ' + member.gradient">
+                        <span class="filter drop-shadow-sm">{{ member.image }}</span>
+                      </div>
+                      
+                      <!-- Status Indicator -->
+                      <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-3 border-white flex items-center justify-center">
+                        <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="text-center space-y-3">
+                      <h3 class="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors duration-300">
+                        {{ member.name }}
+                      </h3>
+                      
+                      <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                           :class="'bg-gradient-to-r ' + member.gradient + ' text-white'">
+                        {{ member.position }}
+                      </div>
+                      
+                      <p class="text-gray-600 text-sm leading-relaxed">
+                        {{ member.description }}
+                      </p>
+                      
+                      <!-- Skills -->
+                      <div class="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                        <div class="flex flex-wrap justify-center gap-2 mt-4">
+                          <span v-for="skill in member.skills" :key="skill"
+                                class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-lg font-medium">
+                            {{ skill }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Hover Effect Border -->
+                    <div class="absolute inset-0 border-2 border-transparent group-hover:border-purple-200 rounded-3xl transition-all duration-500"></div>
+                    
+                    <!-- Floating Elements -->
+                    <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div class="w-8 h-8 rounded-full opacity-20"
+                           :class="'bg-gradient-to-br ' + member.gradient"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- Social Links (Hidden by default) -->
+                  <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-4 transition-all duration-500">
+                    <div class="flex space-x-2">
+                      <button class="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-blue-600 hover:bg-blue-50 transition-colors">
+                        💼
+                      </button>
+                      <button class="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-blue-600 hover:bg-blue-50 transition-colors">
+                        📧
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Bottom Section -->
+              <div class="text-center mt-20">
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
+                  <h3 class="text-2xl font-bold text-gray-900 mb-4">Dołącz do naszego zespołu!</h3>
+                  <p class="text-gray-600 mb-6">Szukamy utalentowanych programistów i designerów, którzy chcą tworzyć przyszłość technologii.</p>
+                  <button class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-300">
+                    <span class="mr-2">🚀</span>
+                    <span>Zobacz oferty pracy</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        `,
+      };
+
+      // Contact Section Component
+      const ContactSection = {
+        data() {
+          return {
+            form: {
+              name: "",
+              email: "",
+              company: "",
+              message: "",
+            },
+            isSubmitted: false,
+          };
+        },
+        methods: {
+          submitForm() {
+            // Simulacja wysłania formularza
+            this.isSubmitted = true;
+            setTimeout(() => {
+              this.isSubmitted = false;
+              this.form = { name: "", email: "", company: "", message: "" };
+            }, 3000);
+          },
+        },
+        template: `
+          <section id="contact" class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Skontaktuj się z nami</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                  Gotowy na rozpoczęcie projektu? Napisz do nas!
+                </p>
+              </div>
+              
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Contact Info -->
+                <div>
+                  <h3 class="text-2xl font-bold text-gray-900 mb-6">Informacje kontaktowe</h3>
+                  <div class="space-y-4">
+                    <div class="flex items-center">
+                      <span class="text-2xl mr-4">📧</span>
+                      <div>
+                        <p class="font-semibold">Email</p>
+                        <p class="text-gray-600">kontakt@techsolutions.pl</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center">
+                      <span class="text-2xl mr-4">📞</span>
+                      <div>
+                        <p class="font-semibold">Telefon</p>
+                        <p class="text-gray-600">+48 123 456 789</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center">
+                      <span class="text-2xl mr-4">📍</span>
+                      <div>
+                        <p class="font-semibold">Adres</p>
+                        <p class="text-gray-600">ul. Technologiczna 1<br>00-001 Warszawa</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Contact Form -->
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                  <div v-if="isSubmitted" class="text-center py-8">
+                    <div class="text-6xl mb-4">✅</div>
+                    <h3 class="text-2xl font-bold text-green-600 mb-2">Dziękujemy!</h3>
+                    <p class="text-gray-600">Wiadomość została wysłana. Skontaktujemy się z Tobą wkrótce.</p>
+                  </div>
+                  
+                  <form v-else @submit.prevent="submitForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Imię i nazwisko</label>
+                        <input v-model="form.name" type="text" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                      </div>
+                      <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                        <input v-model="form.email" type="email" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                      </div>
+                    </div>
+                    <div class="mb-4">
+                      <label class="block text-gray-700 font-semibold mb-2">Firma</label>
+                      <input v-model="form.company" type="text"
+                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div class="mb-6">
+                      <label class="block text-gray-700 font-semibold mb-2">Wiadomość</label>
+                      <textarea v-model="form.message" rows="4" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                placeholder="Opisz swój projekt..."></textarea>
+                    </div>
+                    <button type="submit" 
+                            class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition duration-300">
+                      Wyślij wiadomość
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+        `,
+      };
+
+      // Footer Component
+      const FooterComponent = {
+        template: `
+          <footer class="bg-gray-900 text-white py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                  <h3 class="text-2xl font-bold mb-4">TechSolutions</h3>
+                  <p class="text-gray-400">
+                    Twój partner w transformacji cyfrowej. 
+                    Tworzymy przyszłość biznesu już dziś.
+                  </p>
+                </div>
+                <div>
+                  <h4 class="font-semibold mb-4">Usługi</h4>
+                  <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">Rozwój aplikacji</a></li>
+                    <li><a href="#" class="hover:text-white transition">Cloud Computing</a></li>
+                    <li><a href="#" class="hover:text-white transition">Cyberbezpieczeństwo</a></li>
+                    <li><a href="#" class="hover:text-white transition">Konsultacje IT</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold mb-4">Firma</h4>
+                  <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">O nas</a></li>
+                    <li><a href="#" class="hover:text-white transition">Kariera</a></li>
+                    <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                    <li><a href="#" class="hover:text-white transition">Kontakt</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold mb-4">Śledź nas</h4>
+                  <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition text-2xl">📘</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition text-2xl">🐦</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition text-2xl">💼</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition text-2xl">📷</a>
+                  </div>
+                </div>
+              </div>
+              <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 TechSolutions. Wszystkie prawa zastrzeżone.</p>
+              </div>
+            </div>
+          </footer>
+        `,
+      };
+
+      // Main App
+      createApp({
+        components: {
+          NavComponent,
+          HeroSection,
+          ServicesSection,
+          AboutSection,
+          TeamSection,
+          ContactSection,
+          FooterComponent,
+        },
+        data() {
+          return {
+            isMobileMenuOpen: false,
+          };
+        },
+        methods: {
+          toggleMobileMenu() {
+            this.isMobileMenuOpen = !this.isMobileMenuOpen;
+          },
+          scrollToContact() {
+            this.$refs.contactSection.$el.scrollIntoView({
+              behavior: "smooth",
+            });
+          },
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>
